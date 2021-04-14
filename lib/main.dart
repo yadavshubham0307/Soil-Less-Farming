@@ -45,6 +45,26 @@ class _MyHomePageState extends State<MyHomePage> {
   List<int> switch_2_off = utf8.encode('S,M,0,0');
   List<int> switch_both_on = utf8.encode('S,M,1,1');
   List<int> switch_both_off = utf8.encode('S,M,0,0');
+  List<int> initial_period=utf8.encode('S,P');
+  List<int> dilima =utf8.encode(',');
+  var p_switch_1_h_on;
+  var p_switch_1_h_off;
+  var p_switch_2_h_on;
+  var p_switch_2_h_off;
+  var p_switch_1_m_on;
+  var p_switch_1_m_off;
+  var p_switch_2_m_on;
+  var p_switch_2_m_off;
+  var switch_period = utf8.encode('');
+  String p_s_1_h_on="00";
+  String p_s_1_h_off="00";
+  String p_s_2_h_on="00";
+  String p_s_2_h_off="00";
+  String p_s_1_m_on="00";
+  String p_s_1_m_off="00";
+  String p_s_2_m_on="00";
+  String p_s_2_m_off="00";
+
   _addDeviceTolist(final BluetoothDevice device) {
     if (!widget.devicesList.contains(device)) {
       setState(() {
@@ -175,10 +195,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   print(display);
                   print("---------");
 
-               // }
-                //print(widget.readValues[characteristic.uuid].toString());
-               // print(display);
-                //sub.cancel();
               },
             ),
           ),
@@ -236,79 +252,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     }
-    /*if (characteristic.properties.write) {
-      buttons.add(
-        ButtonTheme(
-          minWidth: 100,
-          height: 35,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: RaisedButton(
-              child: Text('WRITE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.white),),
-              onPressed: () async {
-                await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Write",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                        content: Row(
-                          children: <Widget>[
-                            //Expanded(
-                              //child: TextField(
-                               // controller: _writeController,
-                             // ),
-                           // ),
-                          ],
-                        ),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text("Send",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.blue)),
-                            onPressed: () {
-                              characteristic.write(//utf8.encode(_writeController.value.text)
-                               [73] ,);
-                              print("write Data!");
-                              print(utf8.encode(_writeController.value.text));
-                              print("-----------");
-                              Navigator.pop(context);
-                            },
-                          ),
-                          FlatButton(
-                            child: Text("Cancel",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    });
-              },
-            ),
-          ),
-        ),
-      );
-    }
- */
 
-    /*if (characteristic.properties.notify) {
-      buttons.add(
-        ButtonTheme(
-          minWidth: 10,
-          height: 20,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: RaisedButton(
-              child: Text('NOTIFY', style: TextStyle(color: Colors.white)),
-              onPressed: () async {
-                characteristic.value.listen((value) {
-                  widget.readValues[characteristic.uuid] = value;
-                });
-                await characteristic.setNotifyValue(true);
-              },
-            ),
-          ),
-        ),
-      );
-    }*/
+
 
     return buttons;
   }
@@ -353,10 +298,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       ..._buildReadWriteNotifyButton(characteristic),
                     ],
                   ),
+
                   Row(
                     children: <Widget>[
                       Center(child:Text('               <-Manual->' //+display
@@ -364,6 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     ],
                   ),
+                  Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -441,18 +389,428 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     ],
                   ),
-                  Card(
+                  Divider(),
+                 /* Card(
                     child:  Container(
-
+                        width: 80,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Hours',
+                            hintText: 'Hrs:',
+                          ),
+                          autofocus: false,
                         )
+                        )
+                      ),*/
+                  Row(
+                    children: <Widget>[
+                      Center(child:Text("                 Switch 1"
+                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.green)),),
+
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Center(child:Text("                    Hrs.    :     Min."
+                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
+
+                    ],
+                  ),
+                  Row(
+                   // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("On Time   ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                       RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_1_h_on, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                         p_switch_1_h_on=utf8.encode(_writeController.value.text);
+                                         p_s_1_h_on=_writeController.value.text;
+                                         print("p_switch_1_h_on----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
                       ),
-                  /* Row(
-                  children: <Widget>[
-                    Text('Value: ' //+display
-                        ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26, color: Colors.grey)),
-                      // widget.readValues[characteristic.uuid].toString()),
-                  ],
-                ),   */
+                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_1_m_on, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_1_m_on=utf8.encode(_writeController.value.text);
+                                        p_s_1_m_on=_writeController.value.text;
+                                        print("p_switch_1_m_on----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("Off Time   ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_1_h_off, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_1_h_off=utf8.encode(_writeController.value.text);
+                                        p_s_1_h_off=_writeController.value.text;
+                                        print("p_switch_1_h_off----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_1_m_off, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_1_m_off=utf8.encode(_writeController.value.text);
+                                        p_s_1_m_off=_writeController.value.text;
+                                        print("p_switch_1_m_off----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                    ],
+                  ),
+                  Divider(),
+                  Row(
+                    children: <Widget>[
+                      Center(child:Text("                 Switch 2"
+                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.green)),),
+
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Center(child:Text("                    Hrs.    :     Min."
+                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
+
+                    ],
+                  ),
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("On Time   ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_2_h_on, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_2_h_on=utf8.encode(_writeController.value.text);
+                                        p_s_2_h_on=_writeController.value.text;
+                                        print("p_switch_2_h_on----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_2_m_on, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_2_m_on=utf8.encode(_writeController.value.text);
+                                        p_s_2_m_on=_writeController.value.text;
+                                        print("p_switch_2_m_on----");
+                                        print(p_switch_2_m_on);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("Off Time   ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_2_h_off, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_2_h_off=utf8.encode(_writeController.value.text);
+                                        p_s_2_h_off=_writeController.value.text;
+                                        print("p_switch_2_h_off----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      RaisedButton(
+                        color: Colors.white,
+                        child: Text(p_s_2_m_off, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                        onPressed: () async {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Write"),
+                                  content: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _writeController,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        p_switch_2_m_off=utf8.encode(_writeController.value.text);
+                                        p_s_2_m_off=_writeController.value.text;
+                                        print("p_switch_2_m_off----");
+                                        print(_writeController.value.text);
+                                        print("----------");
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      new RaisedButton(
+                        child: Text("Period Set", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+                        elevation: 5.0,
+                        color: Colors.brown,
+                        onPressed: () {
+
+                          switch_period=initial_period+dilima+p_switch_1_h_on+p_switch_1_m_on+p_switch_2_h_off+p_switch_1_m_off+dilima+p_switch_2_h_on+p_switch_2_m_on+p_switch_2_h_off+p_switch_2_m_off;
+                          characteristic.write(switch_period);
+
+                          print("switch Period___");
+                          print(switch_period);
+                          print("------------------");
+                          // Do something here
+                        },
+                      ),
+
+                    ],
+                  ),
+
                   Divider(),
                 ],
               ),
