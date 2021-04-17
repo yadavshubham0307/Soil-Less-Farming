@@ -20,14 +20,28 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue: 0.6.3+1
+  numberpicker: ^2.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  flutter_launcher_icons: ^0.7.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
+flutter_launcher-icons:
+  path: ../
+
+flutter_icons:
+  image_path_android: "switch_img.png"
+  image_path_ios: "switch_img.png"
+  android: true
+  ios: true
+  adaptive_icon_background: "switch_img.png"
+  adaptive_icon_foreground: "switch_img.png"
 
 
 # For information on the generic Dart part of this file, see the
