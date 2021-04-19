@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -32,11 +33,33 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  TimeOfDay _time_s1_f = TimeOfDay(hour: 00, minute: 00);
+  TimeOfDay _time_s1_f = TimeOfDay( hour: 00, minute: 00);
   TimeOfDay _time_s1_t = TimeOfDay(hour: 00, minute: 00);
   TimeOfDay _time_s2_f = TimeOfDay(hour: 00, minute: 00);
   TimeOfDay _time_s2_t = TimeOfDay(hour: 00, minute: 00);
   //void _selectTime()
+
+  int _currentValue1_h_on = 0;
+  int _currentValue2_h_on = 0;
+  int _currentValue1_h_off = 0;
+  int _currentValue2_h_off = 0;
+  int _currentValue1_m_on = 0;
+  int _currentValue2_m_on = 0;
+  int _currentValue1_m_off = 0;
+  int _currentValue2_m_off = 0;
+
+
+
+  int _currentValue1_h_f = 0;
+  int _currentValue2_h_f = 0;
+  int _currentValue1_h_t = 0;
+  int _currentValue2_h_t = 0;
+  int _currentValue1_m_t = 0;
+  int _currentValue2_m_f = 0;
+  int _currentValue1_m_f = 0;
+  int _currentValue2_m_t = 0;
+
+
 
   final _writeController = TextEditingController();
   final String SERVICE_UUID = "208fc8fc-64ed-4423-ba22-2230821ae406";
@@ -57,23 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<int> initial_period=utf8.encode('S,P');
   List<int> dilima =utf8.encode(',');
-  var p_switch_1_h_on;
-  var p_switch_1_h_off;
-  var p_switch_2_h_on;
-  var p_switch_2_h_off;
-  var p_switch_1_m_on;
-  var p_switch_1_m_off;
-  var p_switch_2_m_on;
-  var p_switch_2_m_off;
+
   var switch_period = utf8.encode('');
-  String p_s_1_h_on="00";
-  String p_s_1_h_off="00";
-  String p_s_2_h_on="00";
-  String p_s_2_h_off="00";
-  String p_s_1_m_on="00";
-  String p_s_1_m_off="00";
-  String p_s_2_m_on="00";
-  String p_s_2_m_off="00";
+
 
   var switch_rtc_set;
   List<int> initial_timertcframe=utf8.encode('C');
@@ -386,20 +395,30 @@ List _time_split(var _time_show){
 }
 
 
+List period_2d_no(int no){
+  String sno = no.toString();
+  if(sno.length==1){
+    sno="0"+sno;
+  }
+  return utf8.encode(sno);
+}
+
+
   ListView _buildConnectDeviceView() {
     List<Container> containers = new List<Container>();
-
+    List<Container> containers_manual = new List<Container>();
+    List<Container> containers_period = new List<Container>();
+    List<Container> containers_timeframe = new List<Container>();
     for (BluetoothService service in _services) {
       if(service.uuid.toString() == SERVICE_UUID){
       List<Widget> characteristicsWidget = new List<Widget>();
-
+      List<Widget> characteristicsWidget_manual = new List<Widget>();
+      List<Widget> characteristicsWidget_period = new List<Widget>();
+      List<Widget> characteristicsWidget_timeframe = new List<Widget>();
       for (BluetoothCharacteristic characteristic in service.characteristics) {
         if (characteristic.uuid.toString() == CHARACTERISTIC_UUID) {
-          // print("jjk");
+
           strArr = widget.readValues[characteristic.uuid];
-          // print(strArr);
-          //  display=utf8.decode(strArr);
-          // print(widget.readValues[characteristic.uuid].toString());
 
           characteristicsWidget.add(
             Align(
@@ -612,15 +631,18 @@ List _time_split(var _time_show){
                   ),
 
 
+                ],
+              ),
+            ),
+          );
 
-                  Divider(),
-                  Row(
-                    children: <Widget>[
-                      Center(child:Text('               <-Manual->' //+display
-                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)),),
+          characteristicsWidget_manual.add(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: <Widget>[
 
-                    ],
-                  ),
+
                   Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -692,27 +714,20 @@ List _time_split(var _time_show){
                       ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Center(child:Text("               <-Periodic->"
-                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)),),
+                ],
+              ),
+            ),
+          );
 
-                    ],
-                  ),
+
+          characteristicsWidget_period.add(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: <Widget>[
+
                   Divider(),
-                 /* Card(
-                    child:  Container(
-                        width: 80,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Hours',
-                            hintText: 'Hrs:',
-                          ),
-                          autofocus: false,
-                        )
-                        )
-                      ),*/
+
                   Row(
                     children: <Widget>[
                       Center(child:Text("                 Switch 1"
@@ -722,11 +737,72 @@ List _time_split(var _time_show){
                   ),
                   Row(
                     children: <Widget>[
-                      Center(child:Text("                    Hrs.    :     Min."
+                      Center(child:Text("                            Hrs.    :     Min."
                           ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
 
                     ],
                   ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("On Time ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue1_h_on,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_h_on = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue1_m_on,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_m_on = value),
+                      ),
+
+                    ],
+
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("Off Time ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue1_h_off,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_h_off = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue1_m_off,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_m_off = value),
+                      ),
+
+                    ],
+
+                  ),
+
+                  /*
                   Row(
                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -905,6 +981,8 @@ List _time_split(var _time_show){
                       ),
                     ],
                   ),
+                  */
+
                   Divider(),
                   Row(
                     children: <Widget>[
@@ -915,11 +993,72 @@ List _time_split(var _time_show){
                   ),
                   Row(
                     children: <Widget>[
-                      Center(child:Text("                    Hrs.    :     Min."
+                      Center(child:Text("                             Hrs.    :     Min."
                           ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
 
                     ],
                   ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("On Time ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue2_h_on,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_h_on = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue2_m_on,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_m_on = value),
+                      ),
+
+                    ],
+
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("Off Time ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue2_h_off,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_h_off = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue2_m_off,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_m_off = value),
+                      ),
+
+                    ],
+
+                  ),
+
+                  /*
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -1099,6 +1238,8 @@ List _time_split(var _time_show){
                       ),
                     ],
                   ),
+                  */
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -1108,10 +1249,11 @@ List _time_split(var _time_show){
                         color: Colors.brown,
                         onPressed: () {
 
-                          switch_period=initial_period+dilima+p_switch_1_h_on+p_switch_1_m_on+p_switch_2_h_off+p_switch_1_m_off+dilima+p_switch_2_h_on+p_switch_2_m_on+p_switch_2_h_off+p_switch_2_m_off;
+                          switch_period=initial_period+dilima+period_2d_no(_currentValue1_h_on)+period_2d_no(_currentValue1_m_on)+period_2d_no(_currentValue1_h_off)+period_2d_no(_currentValue1_m_off)+dilima+period_2d_no(_currentValue2_h_on)+period_2d_no(_currentValue2_m_on)+period_2d_no(_currentValue2_h_off)+period_2d_no(_currentValue2_m_off);
                           characteristic.write(switch_period);
 
                           print("switch Period___");
+                          print(utf8.decode(switch_period));
                           print(switch_period);
                           print("------------------");
                           // Do something here
@@ -1122,14 +1264,18 @@ List _time_split(var _time_show){
                   ),
 
                   Divider(),
+                ],
+              ),
+            ),
+          );
 
-                  Row(
-                    children: <Widget>[
-                      Center(child:Text("           <-Time Frame->"
-                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)),),
 
-                    ],
-                  ),
+
+          characteristicsWidget_timeframe.add(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: <Widget>[
                   Divider(),
 
                   Row(
@@ -1138,6 +1284,73 @@ List _time_split(var _time_show){
                           ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.green.shade900)),),
 
                     ],
+                  ),
+
+                  Row(
+                    children: <Widget>[
+                      Center(child:Text("                             Hrs.    :     Min."
+                          ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
+
+                    ],
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("From ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue1_h_f,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_h_f = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue1_m_f,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_m_f = value),
+                      ),
+
+                    ],
+
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("To     ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue1_h_t,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_h_t = value),
+                      ),
+
+                      NumberPicker(
+                        value: _currentValue1_m_t,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue1_m_t = value),
+                      ),
+
+                    ],
+
                   ),
 
                   /*
@@ -1149,7 +1362,7 @@ List _time_split(var _time_show){
                     ],
                   ),
 
-                  */
+
 
                   Row(
 
@@ -1209,7 +1422,7 @@ List _time_split(var _time_show){
                   ),
 
 
-                  /*
+
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -1399,249 +1612,75 @@ List _time_split(var _time_show){
                     ],
                   ),
 
-                  Row(
 
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-
-                        onPressed: () async {
-                          final TimeOfDay newTime = await showTimePicker(
-                            context: context,
-                            initialTime: _time_s2_f,
-                          );
-                          if (newTime != null) {
-                            setState(() {
-                              _time_s2_f = newTime;
-                            });
-                          }
-                          //String time_split=_time.format(context);
-
-                          print(_time_split(_time_s1_f.format(context)));
-                        },
-                        child: Text('From',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.white)),
-                      ),
-                      SizedBox(height: 8),
-                      //${_time.format(context)}
-                      Text('     Selected time: ${_time_s2_f.format(context)}',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
-
-                    ],
-                  ),
-                  Row(
-
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          final TimeOfDay newTime = await showTimePicker(
-                            context: context,
-                            initialTime: _time_s2_t,
-                          );
-                          if (newTime != null) {
-                            setState(() {
-                              _time_s2_t = newTime;
-                            });
-                          }
-                        },
-                        child: Text('   To  ',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.white)),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                          '    Selected time: ${_time_s2_t.format(context)}',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
-
-                    ],
-                  ),
-
-                  /*
                   Row(
                     children: <Widget>[
-                      Center(child:Text("                    Hrs.    :     Min."
+                      Center(child:Text("                             Hrs.    :     Min."
                           ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.brown)),),
 
                     ],
                   ),
-                  Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Text("From         ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                      RaisedButton(
-                        color: Colors.white,
-                        child: Text(t_s_2_h_from, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                        onPressed: () async {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Write"),
-                                  content: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _writeController,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: Text("Send"),
-                                      onPressed: () {
-                                        t_switch_2_h_from=utf8.encode(_writeController.value.text);
-                                        t_s_2_h_from=_writeController.value.text;
-                                        print("t_switch_2_h_from----");
-                                        print(_writeController.value.text);
-                                        print("----------");
-                                        Navigator.pop(context);
-                                      },
-                                    ),
 
-                                    FlatButton(
-                                      child: Text("Cancel"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
-                        },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("From ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue2_h_f,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_h_f = value),
                       ),
-                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                      RaisedButton(
-                        color: Colors.white,
-                        child: Text(t_s_2_m_from, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                        onPressed: () async {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Write"),
-                                  content: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _writeController,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: Text("Send"),
-                                      onPressed: () {
-                                        t_switch_2_m_from=utf8.encode(_writeController.value.text);
-                                        t_s_2_m_from=_writeController.value.text;
-                                        print("t_switch_2_m_from----");
-                                        print(t_switch_2_m_from);
-                                        print("----------");
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    FlatButton(
-                                      child: Text("Cancel"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
-                        },
+
+                      NumberPicker(
+                        value: _currentValue2_m_f,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_m_f = value),
                       ),
+
                     ],
+
                   ),
                   Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      Text("To              ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                      RaisedButton(
-                        color: Colors.white,
-                        child: Text(t_s_2_h_to, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                        onPressed: () async {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Write"),
-                                  content: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _writeController,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: Text("Send"),
-                                      onPressed: () {
-                                        t_switch_2_h_to=utf8.encode(_writeController.value.text);
-                                        t_s_2_h_to=_writeController.value.text;
-                                        print("t_switch_2_h_to----");
-                                        print(_writeController.value.text);
-                                        print("----------");
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    FlatButton(
-                                      child: Text("Cancel"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
-                        },
+                      Text("To     ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
+                      NumberPicker(
+                        value: _currentValue2_h_t,
+                        minValue: 0,
+                        maxValue: 24,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_h_t = value),
                       ),
-                      Text(" : ",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                      RaisedButton(
-                        color: Colors.white,
-                        child: Text(t_s_2_m_to, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23, color: Colors.black)),
-                        onPressed: () async {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Write"),
-                                  content: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _writeController,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: Text("Send"),
-                                      onPressed: () {
-                                        t_switch_2_m_to=utf8.encode(_writeController.value.text);
-                                        t_s_2_m_to=_writeController.value.text;
-                                        print("t_switch_2_m_to----");
-                                        print(_writeController.value.text);
-                                        print("----------");
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    FlatButton(
-                                      child: Text("Cancel"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
-                        },
+
+                      NumberPicker(
+                        value: _currentValue2_m_t,
+                        minValue: 0,
+                        maxValue: 60,
+                        axis: Axis.horizontal,
+                        itemHeight: 23,
+                        itemWidth: 28,
+                        //step: 1,
+                        onChanged: (value) => setState(() => _currentValue2_m_t = value),
                       ),
+
                     ],
+
                   ),
-                  */
+
+
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1652,23 +1691,11 @@ List _time_split(var _time_show){
                         color: Colors.green.shade900,
                         onPressed: () {
 
-                          switch_timeframe=initial_timeframe+dilima+_time_split(_time_s1_f.format(context))+_time_split(_time_s1_t.format(context))+dilima+_time_split(_time_s2_f.format(context))+_time_split(_time_s2_t.format(context));
+                          switch_timeframe=initial_timeframe+dilima+period_2d_no(_currentValue1_h_f)+period_2d_no(_currentValue1_m_f)+period_2d_no(_currentValue1_h_t)+period_2d_no(_currentValue1_m_t)+dilima+period_2d_no(_currentValue2_h_f)+period_2d_no(_currentValue2_m_f)+period_2d_no(_currentValue2_h_t)+period_2d_no(_currentValue2_m_t);
                           characteristic.write(switch_timeframe);
 
-                          print("time frame for switch 1 from ----");
-                          print(_time_split(_time_s1_f.format(context)));
-                          print(utf8.decode(_time_split(_time_s1_f.format(context))));
-                          print("time frame for switch 1 to ----");
-                          print(_time_split(_time_s1_t.format(context)));
-                          print(utf8.decode(_time_split(_time_s1_t.format(context))));
-                          print("time frame for switch 2 from ----");
-                          print(_time_split(_time_s2_f.format(context)));
-                          print(utf8.decode(_time_split(_time_s2_f.format(context))));
-                          print("time frame for switch 2 to ----");
-                          print(_time_split(_time_s2_t.format(context)));
-                          print(utf8.decode(_time_split(_time_s2_t.format(context))));
                           print("----------");
-                          print("switch Time Frame___");
+                          print("switch Time Frame_____");
                           print(switch_timeframe);
                           print(utf8.decode(switch_timeframe));
                           print("------------------");
@@ -1679,29 +1706,52 @@ List _time_split(var _time_show){
                     ],
                   ),
 
-
-
-
-
-
-
-
-
                   Divider(),
                 ],
               ),
             ),
           );
+
         }
 
-       containers.add(
+      containers.add(
           Container(
             child: ExpansionTile(
-                title: Center(child:Text("---------Switch---------",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)) ,),
+                title: Center(child:Text("  Switch Info",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)) ,),
                 children: characteristicsWidget,
             ),
           ),
         );
+
+        containers_manual.add(
+          Container(
+            child: ExpansionTile(
+              title: Center(child:Text("  Manual Switch",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)) ,),
+              children: characteristicsWidget_manual,
+            ),
+          ),
+        );
+
+
+        containers_period.add(
+          Container(
+            child: ExpansionTile(
+              title: Center(child:Text("  Periodic Switch",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)) ,),
+              children: characteristicsWidget_period,
+            ),
+          ),
+        );
+
+
+        containers_timeframe.add(
+          Container(
+            child: ExpansionTile(
+              title: Center(child:Text("  Time Frame Switch",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.black)) ,),
+              children: characteristicsWidget_timeframe,
+            ),
+          ),
+        );
+
       }
     }
     }
@@ -1710,6 +1760,10 @@ List _time_split(var _time_show){
       padding: const EdgeInsets.all(8),
       children: <Widget>[
         ...containers,
+        ...containers_manual,
+        ...containers_period,
+        ...containers_timeframe,
+
       ],
     );
   }
